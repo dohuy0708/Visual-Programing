@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Security.Policy;
 using System.Text;
+ 
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -17,8 +18,9 @@ namespace GDI_GunGun
         int index = 0;
         Timer timer = new Timer();
         Timer timer2 = new Timer();
+        Timer timer3 = new Timer();
         Bitmap backBuffer;
-        Bitmap sprite;
+        Bitmap sprite = new Bitmap("Images/stockExploision .png");
         Graphics graphics;
         int curFrameColumn;
         int curFrameRow;
@@ -27,6 +29,8 @@ namespace GDI_GunGun
         Image spaceship = Image.FromFile("Images/spaceship.png");
         Image bul = Image.FromFile("Images/bullet.png");
         Random random = new Random();
+        // khởi tạo vị trí vụ nổ 
+        int x, y, flag=0;
 
         // khoi tao 1 spaceship
         SpaceShip space = new SpaceShip(200, 450, 100, 80);
@@ -46,6 +50,7 @@ namespace GDI_GunGun
             // khởi tạo đồng hồ
 
             timer.Enabled = true;
+            timer.Stop();
             timer.Interval = 100;
             timer.Tick += new EventHandler(timer_Tick);
           
@@ -53,18 +58,23 @@ namespace GDI_GunGun
 
             // KHỞI TẠO ĐỒNG HỒ 2
             timer2.Enabled = true;
+            
             timer2.Interval = 3000;
             timer2.Tick += new EventHandler(timer2_Tick);
 
-            
+            // KHỞI TẠO ĐỒNG HỒ 3
+         
+            timer3.Interval = 60;
+ 
+            timer3.Tick += new EventHandler(timer3_Tick);
 
             // khởi tạo graphics
-            graphics = this.CreateGraphics();
+            graphics=this.CreateGraphics();
 
             SetStyle(ControlStyles.AllPaintingInWmPaint, true);
 
             backBuffer = new Bitmap( (this.ClientSize.Width),  (this.ClientSize.Height));
-            sprite = new Bitmap("Images/stockExploision-removebg-preview.png");
+            
 
 
             
@@ -77,9 +87,8 @@ namespace GDI_GunGun
         private void timer_Tick(object sender, EventArgs e)
         {
 
-            /* Render(60, 60);
-             graphics.DrawImage(backBuffer ,0, 0);*/
-
+         
+            Exploision();
             Move();
             Refresh();
         }
@@ -87,14 +96,24 @@ namespace GDI_GunGun
         {
            
              
-            RockList.Add(new Rock(random.Next(5,this.Width-40), -30));
+            RockList.Add(new Rock(random.Next(5,this.Width-80),-10));
+
+            
 
         }
+        private void timer3_Tick(object sender, EventArgs e)
+        {
+            Render();
+            graphics.DrawImageUnscaled(backBuffer, 0, 0);
+             flag++;
+            if (flag>10)
+            {
+                flag=0;
+                timer3.Stop();
+            }
 
-      
-     
 
-
+        }
 
         private void GunGun_Paint(object sender, PaintEventArgs e)
         {
@@ -117,19 +136,33 @@ namespace GDI_GunGun
           // paint bullet
             foreach( Bullet bullet in bulletList)
             {
-                bullet.y-= bullet.speed;
-                e.Graphics.DrawImage(bul, (float)bullet.x,(float) bullet.y, 70, 70);
-            }    
+                
+                {
+                    bullet.y-= bullet.speed;
+                    e.Graphics.DrawImage(bul, (float)bullet.x, (float)bullet.y, 70, 70);
+                }
+                if ( bullet.y<0)
+                {
+                     
+                }    
+
+                
+                
+            }   
+            
+
+
         }
         private void GunGun_Load(object sender, EventArgs e)
         {
             
         }
-        private void Render(int x, int y)
+        private void Render( )
         {
             // Lấy đối tượng graphics để vẽ lên back buffer
+          
             Graphics g = Graphics.FromImage(backBuffer);
-            // g.Clear(Color.White);
+             g.Clear(Color.Empty);
 
             // Xác dịnh số dòng, cột của một frame trên ảnh sprite
 
@@ -137,13 +170,17 @@ namespace GDI_GunGun
             curFrameRow = index / 5;
             // Vẽ lên buffer
 
-            g.DrawImage(sprite, x, y, new Rectangle(curFrameColumn * 158, curFrameRow * 158, 158, 158), GraphicsUnit.Pixel);
+            g.DrawImage(sprite, x, y, new Rectangle(curFrameColumn * 79, curFrameRow *79, 79, 79), GraphicsUnit.Pixel);
             g.Dispose();
 
 
             // Tăng thứ tự frame để lấy frame tiếp theo
 
-            index++;
+
+            if (index >9)
+                index =0;
+            else
+                index++;
 
         }
         private void Exploision()
@@ -153,13 +190,16 @@ namespace GDI_GunGun
             // kiểm tra tọa độ của các rock so với ship 
             foreach (Rock rock in RockList)
             {
-                if (rock.y > space.y-35 && Math.Abs(rock.x -space.x)<30)
+                if (rock.y > space.y-45 && Math.Abs(rock.x -space.x)<25) // xay ra va cham
                 {
 
-                    Render((int)space.x-20, (int)space.y-20);
-                    graphics.DrawImageUnscaled(backBuffer, 0, 0);
+                    x =(int) space.x; y =(int) space.y-10;
 
-                    return;
+                    timer3.Start();
+                    
+                    timer.Stop();
+                    MessageBox.Show("Game over ");
+                    return; 
 
 
                 }
@@ -170,11 +210,15 @@ namespace GDI_GunGun
             {
                 foreach (Rock rock in RockList)
                 {
-                    if (bul.x > rock.x-10 &&  bul.x < rock.x+10 && bul.y < rock.y+5)
+                    if (bul.x > rock.x-20 &&  bul.x < rock.x+20 && bul.y-20 < rock.y+40) // xay ra va cham 
                     {
-                        Render((int)rock.x, (int)rock.y);
-                        graphics.DrawImageUnscaled(backBuffer, 0, 0);
+                        x =(int)rock.x; y =(int)rock.y;
+
+                        
+                         timer3.Start();
+
                         RockList.Remove(rock);
+                        bulletList.Remove(bul);
                         return;
                     }
                 }
@@ -183,7 +227,7 @@ namespace GDI_GunGun
         }
         private void Move()
         {
-            int x = 9;
+            int x = 10;
 
             if( Keyboard.IsKeyDown(Keys.Up) )
             {
@@ -194,28 +238,28 @@ namespace GDI_GunGun
             }    
             if( Keyboard.IsKeyDown(Keys.Down) )
             {
-                if(space.y < this.Height )
+                if(space.y < this.Height-120 )
                 {
                     space.y+=x;
                 }    
             }    
             if(Keyboard.IsKeyDown(Keys.Left ))
              {
-                if( space.x > 0)
+                if( space.x > -10)
                 {
                     space.x-=x;
                 }    
             }
             if(Keyboard.IsKeyDown (Keys.Right ))
             {
-                if(space.x<this.Width)
+                if(space.x<this.Width -90)
                 {
                     space.x+=x;
                 }    
             } 
             if(Keyboard.IsKeyDown(Keys.Space))
             {
-                Bullet but = new Bullet(space.x, space.y);
+                Bullet but = new Bullet(space.x +15, space.y-40);
                 bulletList.Add(but);
             }    
         }

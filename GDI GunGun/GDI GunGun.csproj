@@ -100,16 +100,13 @@
     <Content Include="Images\spaceship.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Images\stockExploision-removebg-preview.png">
+    <Content Include="Images\stockExploision .png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <None Include="Resources\bggg.jpg" />
+    <None Include="Resources\papers.co-bj23-art-night-sky-dark-blue-1-wallpaper3.jpg" />
+    <None Include="Resources\papers.co-bj23-art-night-sky-dark-blue-1-wallpaper2.jpg" />
     <None Include="Resources\papers.co-bj23-art-night-sky-dark-blue-1-wallpaper.jpg" />
-    <None Include="Resources\811be1795e55e5585c30b16e526f307a.jpg" />
-    <None Include="Resources\bg.gif" />
-    <None Include="Resources\background1.jpg" />
-    <None Include="Resources\images.jpg" />
-    <None Include="Resources\background.jpg" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

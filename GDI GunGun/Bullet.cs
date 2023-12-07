@@ -16,7 +16,7 @@ namespace GDI_GunGun
         {
             this.x=x;
             this.y=y;
-            this.speed=9;
+            this.speed=15;
         }
     }
 }
