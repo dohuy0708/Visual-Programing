@@ -42,7 +42,8 @@
             this.Name = "GunGun";
             this.Load += new System.EventHandler(this.GunGun_Load);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.GunGun_Paint);
-           
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.GunGun_KeyDown);
+            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.GunGun_KeyUp);
             this.ResumeLayout(false);
 
         }

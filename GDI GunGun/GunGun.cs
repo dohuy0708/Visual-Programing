@@ -36,9 +36,12 @@ namespace GDI_GunGun
         {
 
             InitializeComponent();
-            // giải quyết nháy hình 
+            // sự kiện keyboard
+            KeyDown += Keyboard.OnKeyDown;
+            KeyUp += Keyboard.OnKeyUp;
 
-           DoubleBuffered = true;
+            // giải quyết nháy hình
+            DoubleBuffered = true;
 
             // khởi tạo đồng hồ
 
@@ -64,40 +67,12 @@ namespace GDI_GunGun
             sprite = new Bitmap("Images/stockExploision-removebg-preview.png");
 
 
-            // khoi tao spaceship
-
-
-
-        }
-        
-
-
-
-    
-        // vẽ một phần ảnh của Sprite
-        private void Render(int x, int y )
-        {
-            // Lấy đối tượng graphics để vẽ lên back buffer
-            Graphics g = Graphics.FromImage(backBuffer);
-           // g.Clear(Color.White);
-
-            // Xác dịnh số dòng, cột của một frame trên ảnh sprite
-
-            curFrameColumn = index % 5;
-            curFrameRow = index / 5;
-            // Vẽ lên buffer
             
-            g.DrawImage(sprite, x, y,new Rectangle(curFrameColumn * 158,curFrameRow * 158, 158, 158), GraphicsUnit.Pixel);
-            g.Dispose();
-             
 
-            // Tăng thứ tự frame để lấy frame tiếp theo
- 
-                index++;
+
 
         }
-
-
+      
         
         private void timer_Tick(object sender, EventArgs e)
         {
@@ -105,6 +80,7 @@ namespace GDI_GunGun
             /* Render(60, 60);
              graphics.DrawImage(backBuffer ,0, 0);*/
 
+            Move();
             Refresh();
         }
         private void timer2_Tick(object sender, EventArgs e)
@@ -116,6 +92,60 @@ namespace GDI_GunGun
         }
 
       
+     
+
+
+
+        private void GunGun_Paint(object sender, PaintEventArgs e)
+        {
+            // repaint potato
+            foreach (Rock rock in RockList)
+            {
+                rock.y += rock.speed;
+                // delete out window potato
+                  
+
+                e.Graphics.DrawImage(potato, (float)rock.x, (float)rock.y,55,75);
+
+                
+
+            }
+            // repaint ship
+        
+            e.Graphics.DrawImage(spaceship, (float)space.x, (float)space.y, 100, 80);
+          
+          // paint bullet
+            foreach( Bullet bullet in bulletList)
+            {
+                bullet.y-= bullet.speed;
+                e.Graphics.DrawImage(bul, (float)bullet.x,(float) bullet.y, 70, 70);
+            }    
+        }
+        private void GunGun_Load(object sender, EventArgs e)
+        {
+            
+        }
+        private void Render(int x, int y)
+        {
+            // Lấy đối tượng graphics để vẽ lên back buffer
+            Graphics g = Graphics.FromImage(backBuffer);
+            // g.Clear(Color.White);
+
+            // Xác dịnh số dòng, cột của một frame trên ảnh sprite
+
+            curFrameColumn = index % 5;
+            curFrameRow = index / 5;
+            // Vẽ lên buffer
+
+            g.DrawImage(sprite, x, y, new Rectangle(curFrameColumn * 158, curFrameRow * 158, 158, 158), GraphicsUnit.Pixel);
+            g.Dispose();
+
+
+            // Tăng thứ tự frame để lấy frame tiếp theo
+
+            index++;
+
+        }
         private void Exploision()
         {
 
@@ -151,76 +181,84 @@ namespace GDI_GunGun
             }
 
         }
-
-
-
-        private void GunGun_Paint(object sender, PaintEventArgs e)
+        private void Move()
         {
-            // repaint potato
-            foreach (Rock rock in RockList)
+            int x = 9;
+
+            if( Keyboard.IsKeyDown(Keys.Up) )
             {
-                rock.y += rock.speed;
-                // delete out window potato
-                  
-
-                e.Graphics.DrawImage(potato, (float)rock.x, (float)rock.y,55,75);
-
-                
-
+                if ( space.y >0  )
+                {
+                    space.y -=x;
+                }    
+            }    
+            if( Keyboard.IsKeyDown(Keys.Down) )
+            {
+                if(space.y < this.Height )
+                {
+                    space.y+=x;
+                }    
+            }    
+            if(Keyboard.IsKeyDown(Keys.Left ))
+             {
+                if( space.x > 0)
+                {
+                    space.x-=x;
+                }    
             }
-            // repaint ship
-        
-            e.Graphics.DrawImage(spaceship, (float)space.x, (float)space.y, 100, 80);
-          //  e.Graphics.DrawImage(bul, (float)space.x+15, (float)space.y-46, 70, 70);
-            foreach( Bullet bullet in bulletList)
+            if(Keyboard.IsKeyDown (Keys.Right ))
             {
-                bullet.y-= bullet.speed;
-                e.Graphics.DrawImage(bul, (float)bullet.x,(float) bullet.y, 70, 70);
+                if(space.x<this.Width)
+                {
+                    space.x+=x;
+                }    
+            } 
+            if(Keyboard.IsKeyDown(Keys.Space))
+            {
+                Bullet but = new Bullet(space.x, space.y);
+                bulletList.Add(but);
             }    
         }
 
+        /// <summary>
+        /// Bỏ cái key vô hashset để xử lí sự kiện keyboard mượt hơn 
+        /// </summary>
+        public static class Keyboard
+        {
+            private static readonly HashSet<Keys> keys = new HashSet<Keys>();
+
+            public static void OnKeyDown(object sender, KeyEventArgs e)
+            {
+                if (keys.Contains(e.KeyCode) == false)
+                {
+                    keys.Add(e.KeyCode);
+                }
+            }
+
+            public static void OnKeyUp(object sender, KeyEventArgs e)
+            {
+                if (keys.Contains(e.KeyCode))
+                {
+                    keys.Remove(e.KeyCode);
+                }
+            }
+
+            public static bool IsKeyDown(Keys key)
+            {
+                return keys.Contains(key);
+            }
+        }
+
+        private void GunGun_KeyUp(object sender, KeyEventArgs e)
+        {
+            Keyboard.OnKeyUp(sender, e);
+        }
 
         private void GunGun_KeyDown(object sender, KeyEventArgs e)
         {
-
-            if (e.KeyCode==Keys.Up)
-            {
-                if (space.y>0)
-                    space.y-=4;
-            }
-            if (e.KeyCode==Keys.Down)
-            {
-                if (space.y<this.Height-120)
-                    space.y+=4;
-            }
-            if (e.KeyCode==Keys.Left)
-            {
-                if (space.x>0)
-                    space.x-=4;
-            }
-            if (e.KeyCode==Keys.Right)
-            {
-                if (space.x<this.Width-80)
-                    space.x+=4;
-            }
-            if (e.KeyCode==Keys.Space)
-            {
-                Bullet bullet = new Bullet(space.x+15, space.y-46);
-                bulletList.Add(bullet);
-            }
-
+            Keyboard.OnKeyDown(sender, e);
         }
         
-
-
-        private void GunGun_Load(object sender, EventArgs e)
-        {
-            
-        }
-        
-        
-
-       
     }
         
 }
