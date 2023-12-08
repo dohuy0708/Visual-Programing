@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Reflection;
 using System.Security.Policy;
@@ -60,7 +59,7 @@ namespace GDI_GunGun
             // KHỞI TẠO ĐỒNG HỒ 2
             timer2.Enabled = true;
             
-            timer2.Interval = 1000;
+            timer2.Interval = 3000;
             timer2.Tick += new EventHandler(timer2_Tick);
 
             // KHỞI TẠO ĐỒNG HỒ 3
@@ -135,17 +134,16 @@ namespace GDI_GunGun
             e.Graphics.DrawImage(spaceship, (float)space.x, (float)space.y, 100, 80);
           
           // paint bullet
-            for(int i =0; i< bulletList.Count;i++)
+            foreach( Bullet bullet in bulletList)
             {
                 
                 {
-                    bulletList[i].y-= bulletList[i].speed;
-                    e.Graphics.DrawImage(bul, (float)bulletList[i].x, (float)bulletList[i].y, 70, 70);
+                    bullet.y-= bullet.speed;
+                    e.Graphics.DrawImage(bul, (float)bullet.x, (float)bullet.y, 70, 70);
                 }
-                if (bulletList[i].y<0)
+                if ( bullet.y<0)
                 {
-                    bulletList.RemoveAt(i);
-                    i--;
+                     
                 }    
 
                 
@@ -192,15 +190,7 @@ namespace GDI_GunGun
             // kiểm tra tọa độ của các rock so với ship 
             foreach (Rock rock in RockList)
             {
-
-               
-                Region reg1 = new Region(new Rectangle((int)rock.x, (int)rock.y, 55, 75));
-                Region recsship = new  Region( new Rectangle((int)(space.x+40), (int)(space.y), 30, 80));
-                Region recship2 = new Region(new Rectangle((int)(space.x), (int)space.y+40, 100, 32));
-                recsship.Union(recship2);
-                Region intersection = reg1.Clone();
-                intersection.Intersect(recsship);
-                if (!intersection.IsEmpty(this.CreateGraphics())) // xay ra va cham
+                if (rock.y > space.y-45 && Math.Abs(rock.x -space.x)<25) // xay ra va cham
                 {
 
                     x =(int) space.x; y =(int) space.y-10;
